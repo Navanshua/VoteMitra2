@@ -25,11 +25,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Authenticate to GCP via Service Account Key (Option 1)
+      env:
+  GCP_REGION: asia-south1
+  ARTIFACT_REGISTRY: asia-south1-docker.pkg.dev
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  # FIX: Resolves the Node.js 20 Deprecation Warning
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Removed id-token: write as it's not needed for JSON keys
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # FIX: Resolves the "specify exactly one" Error
       - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
-          # This references the JSON key you pasted into GitHub Secrets
+          # Using Option 1: Service Account Key
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       # 3. Configure Docker for Artifact Registry
