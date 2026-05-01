@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(_env_path)
 
-from routers import voter, news, candidates, translate, chat, webhook, voter_booth
+from routers import voter, news, candidates, translate, chat, webhook, voter_booth, election_timeline
 
 
 @asynccontextmanager
@@ -40,14 +40,12 @@ app = FastAPI(
 )
 
 # CORS — allow frontend origins
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    os.getenv("FRONTEND_URL", ""),
-]
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten in production via env var
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,6 +59,7 @@ app.include_router(translate.router)
 app.include_router(chat.router)
 app.include_router(webhook.router)
 app.include_router(voter_booth.router)
+app.include_router(election_timeline.router)
 
 
 @app.get("/health")

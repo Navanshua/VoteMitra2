@@ -10,6 +10,7 @@ import NewsCard from './components/NewsCard';
 import CandidateCard from './components/CandidateCard';
 import FormsWizard from './components/FormsWizard';
 import BoothNavigator from './components/BoothNavigator';
+import ElectionTimeline from './components/ElectionTimeline';
 
 export default function App() {
   const [screen, setScreen] = useState('loading');
@@ -174,6 +175,11 @@ function Dashboard({ user, profile, language, onLanguageChange, onLogout }) {
         onLanguageChange={onLanguageChange}
         onLogout={onLogout}
       />
+      {/* Election Timeline – just below the sticky header */}
+      <div className="max-w-7xl mx-auto px-4 pt-6">
+        <ElectionTimeline language={language} state={profile?.state || 'West Bengal'} />
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-12">
         <NewsCard district={profile.district} state={profile.state} language={language} />
         <CandidateCard acName={profile.ac_name} state={profile.state} language={language} />

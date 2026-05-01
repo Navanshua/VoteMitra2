@@ -132,3 +132,12 @@ h1, h2, h3, h4, h5 {
   padding-bottom: 8px;
 }
 .scroll-strip > * { scroll-snap-align: start; flex-shrink: 0; }
+
+/* ── Election Timeline ───────────────────────────────────────── */
+@keyframes livePulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.25); }
+}
+
+/* Hide scrollbar on timeline strip */
+.election-timeline-strip::-webkit-scrollbar { display: none; }

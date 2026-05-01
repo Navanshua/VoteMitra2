@@ -9,8 +9,10 @@ def get_db():
     global _db
     if _db is None:
         if not firebase_admin._apps:
-            # 1. Update the fallback to your actual project ID from the screenshot
-            project_id = os.getenv("GCP_PROJECT_ID", "votemitra-494915") 
+            # 1. Read project ID from environment
+            project_id = os.getenv("GCP_PROJECT_ID")
+            if not project_id:
+                raise ValueError("GCP_PROJECT_ID environment variable is not set")
             try:
                 cred = credentials.ApplicationDefault()
                 firebase_admin.initialize_app(cred, {"projectId": project_id})
@@ -18,5 +20,6 @@ def get_db():
                 firebase_admin.initialize_app(options={"projectId": project_id})
         
         # 2. Specify the database name you created in the Firebase console
-        _db = firestore.client(database_id="votemitra-db")
+        db_name = os.getenv("FIRESTORE_DB_NAME", "votemitra-db")
+        _db = firestore.client(database_id=db_name)
     return _db
