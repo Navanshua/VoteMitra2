@@ -1,0 +1,98 @@
+name: VoterMitra CI/CD — Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  GCP_REGION: asia-south1
+  ARTIFACT_REGISTRY: asia-south1-docker.pkg.dev
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # required for Workload Identity Federation
+      pull-requests: write
+
+    steps:
+      # 1. Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Authenticate to GCP via Workload Identity
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      # 3. Configure Docker for Artifact Registry
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }} --quiet
+
+      # 4. Build & push backend image
+      - name: Build & push backend
+        run: |
+          IMAGE=${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/votermitra/backend:${{ github.sha }}
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+          echo "BACKEND_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      # 5. Build & push frontend image
+      - name: Build & push frontend
+        run: |
+          IMAGE=${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/votermitra/frontend:${{ github.sha }}
+          docker build \
+            --build-arg VITE_GCP_API_KEY=${{ secrets.VITE_GCP_API_KEY }} \
+            --build-arg VITE_GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }} \
+            --build-arg VITE_BACKEND_URL=${{ secrets.BACKEND_CLOUD_RUN_URL }} \
+            --build-arg VITE_MESSAGING_SENDER_ID=${{ secrets.VITE_MESSAGING_SENDER_ID }} \
+            --build-arg VITE_APP_ID=${{ secrets.VITE_APP_ID }} \
+            -t $IMAGE ./frontend
+          docker push $IMAGE
+          echo "FRONTEND_IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      # 6. Deploy backend to Cloud Run
+      - name: Deploy backend to Cloud Run
+        id: deploy-backend
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: votermitra-backend
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.BACKEND_IMAGE }}
+          env_vars: |
+            GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }}
+            GCP_REGION=${{ env.GCP_REGION }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            GCP_API_KEY=${{ secrets.GCP_API_KEY }}
+            GEMINI_MODEL=gemini-1.5-flash
+          flags: --allow-unauthenticated --memory=512Mi --cpu=1
+
+      # 7. Deploy frontend to Cloud Run
+      - name: Deploy frontend to Cloud Run
+        id: deploy-frontend
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: votermitra-frontend
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.FRONTEND_IMAGE }}
+          flags: --allow-unauthenticated --memory=256Mi --cpu=1
+
+      # 8. Comment PR with live URLs
+      - name: Comment PR with live URLs
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚀 VoterMitra Deployed!\n\n| Service | URL |\n|---------|-----|\n| 🌐 Frontend | ${{ steps.deploy-frontend.outputs.url }} |\n| ⚙️ Backend API | ${{ steps.deploy-backend.outputs.url }}/docs |`
+            })

@@ -1,0 +1,16 @@
+# Node
+node_modules/
+npm-debug.log
+dist/
+build/
+
+# Environments
+.env
+.env.*
+
+# OS
+.DS_Store
+
+# Git
+.git/
+.gitignore

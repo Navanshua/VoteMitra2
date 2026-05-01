@@ -1,0 +1,31 @@
+# Environment files — NEVER commit real keys
+.env
+.env.local
+.env.*.local
+frontend/.env.local
+backend/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# GCP credentials
+application_default_credentials.json
+service-account-key.json

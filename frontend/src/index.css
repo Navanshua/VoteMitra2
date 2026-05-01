@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── VoterMitra Global Styles ────────────────────────────────── */
+:root {
+  --navy:     #0a1628;
+  --surface:  #112240;
+  --primary:  #FF6B35;
+  --secondary:#4ECDC4;
+  --text:     #E8F4FD;
+  --muted:    #8892B0;
+  --border:   rgba(255,107,53,0.2);
+  --shadow:   0 4px 24px rgba(0,0,0,0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--navy);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--navy); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+/* ── Skeleton Pulse ─────────────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.skeleton {
+  background: var(--surface);
+  border-radius: 8px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── Fade-in animation ──────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+
+/* ── Typing dots ───────────────────────────────────────────── */
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-6px); }
+}
+.typing-dot {
+  width: 8px; height: 8px;
+  background: var(--secondary);
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce-dot 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0.32s; }
+
+/* ── Card base ─────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+/* ── Primary button ────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, transform 0.15s;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary:hover  { background: #e55a24; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── Input base ─────────────────────────────────────────────── */
+.input-base {
+  background: var(--navy);
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+.input-base:focus {
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.3);
+}
+.input-base::placeholder { color: var(--muted); }
+
+/* ── Badge variants ─────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.badge-green  { background: rgba(78,205,118,0.15); color: #4ECD76; }
+.badge-red    { background: rgba(255,80,80,0.15);  color: #FF5050; }
+.badge-orange { background: rgba(255,107,53,0.15); color: var(--primary); }
+.badge-teal   { background: rgba(78,205,196,0.15); color: var(--secondary); }
+
+/* Horizontal scroll strip */
+.scroll-strip {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+.scroll-strip > * { scroll-snap-align: start; flex-shrink: 0; }
