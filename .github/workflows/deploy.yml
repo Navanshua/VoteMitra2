@@ -25,12 +25,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Authenticate to GCP via Workload Identity
+      # 2. Authenticate to GCP via Service Account Key (Option 1)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          # This references the JSON key you pasted into GitHub Secrets
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       # 3. Configure Docker for Artifact Registry
       - name: Configure Docker
