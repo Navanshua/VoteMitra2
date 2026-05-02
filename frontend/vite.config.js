@@ -12,7 +12,4 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     },
   },
-
-  // Read .env from the project ROOT (one folder up from frontend/)
-  envDir: path.resolve(__dirname, '..'),
 })
