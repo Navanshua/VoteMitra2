@@ -2,17 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="VoterMitra — Your hyper-local Indian civic guide for the 2026 elections. Find candidates, booths, news and voter registration help in your language." />
+    <!-- Instant background color before CSS loads — eliminates flash of white -->
+    <meta name="theme-color" content="#0a1628" />
     <title>VoterMitra — Your Election Companion 🇮🇳</title>
-    <!-- Google Fonts -->
+
+    <!--
+      Preconnect to Google Fonts domains for Firebase/Identity calls that also
+      use these origins. The actual font files are now self-hosted (downloaded
+      at build time by vite-plugin-webfont-dl), so there is NO render-blocking
+      external font stylesheet request.
+    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!--
+      DNS-prefetch for Firebase / Google Identity APIs so auth calls start sooner
+    -->
+    <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+    <link rel="dns-prefetch" href="https://securetoken.googleapis.com" />
+    <link rel="dns-prefetch" href="https://votemitra-backend-470515065386.asia-south1.run.app" />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>VoterMitra requires JavaScript to run. Please enable it in your browser settings.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

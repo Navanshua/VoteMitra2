@@ -40,13 +40,20 @@ app = FastAPI(
 )
 
 # CORS — allow frontend origins
-allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+# NOTE: allow_credentials=True cannot be used with allow_origins=["*"].
+# When ALLOWED_ORIGINS is "*", we must set allow_credentials=False.
+# Always set an explicit comma-separated list of origins in production.
+allowed_origins_env = os.getenv(
+    "ALLOWED_ORIGINS",
+    "https://votemitra-frontend-470515065386.asia-south1.run.app"
+)
 origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+is_wildcard = origins == ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=not is_wildcard,
     allow_methods=["*"],
     allow_headers=["*"],
 )

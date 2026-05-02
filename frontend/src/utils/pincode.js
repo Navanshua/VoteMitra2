@@ -29,7 +29,11 @@ export async function getProfile(idToken) {
   const resp = await fetch(`${BACKEND}/api/voter/profile`, {
     headers: { Authorization: `Bearer ${idToken}` },
   });
-  if (!resp.ok) return null;
+  if (!resp.ok) {
+    console.error(`❌ getProfile failed: HTTP ${resp.status}`, await resp.text().catch(() => ''));
+    return null;
+  }
   const data = await resp.json();
+  console.log('✅ getProfile response:', data);
   return data.profile;
 }

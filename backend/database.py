@@ -1,7 +1,8 @@
 """Firestore client singleton."""
 import os
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials
+import google.cloud.firestore
 
 _db = None
 
@@ -11,6 +12,7 @@ def get_db():
         project_id = os.getenv("GCP_PROJECT_ID", "votemitra-494915")
         db_name = os.getenv("FIRESTORE_DB_NAME", "votemitra-db")
 
+        # Ensure firebase_admin is initialized (needed for auth token verification)
         if not firebase_admin._apps:
             try:
                 cred = credentials.ApplicationDefault()
@@ -18,18 +20,12 @@ def get_db():
             except Exception:
                 firebase_admin.initialize_app(options={"projectId": project_id})
 
-        # Use the named database. firestore.client(database=...) is supported
-        # in firebase-admin >= 6.0; falls back to default if unavailable.
-        try:
-            _db = firestore.client(database=db_name)
-        except TypeError:
-            # Older firebase-admin: database_id or database kwarg not supported.
-            # Fall back to the default database — user must rename it or upgrade.
-            import warnings
-            warnings.warn(
-                f"firebase-admin does not support named databases. "
-                f"Falling back to (default). Upgrade firebase-admin>=6.0 to use '{db_name}'.",
-                stacklevel=2,
-            )
-            _db = firestore.client()
+        # Use google.cloud.firestore.Client directly — this reliably supports
+        # named databases via the `database` kwarg across all relevant versions,
+        # unlike firebase_admin's firestore.client() wrapper which has
+        # inconsistent named-DB support (database= vs database_id= differs by version).
+        _db = google.cloud.firestore.Client(
+            project=project_id,
+            database=db_name,
+        )
     return _db
